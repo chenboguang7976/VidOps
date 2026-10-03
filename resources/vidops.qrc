@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>vidops.png</file>
+    </qresource>
+</RCC>
