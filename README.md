@@ -10,6 +10,8 @@ Under the hood it drives [yt-dlp](https://github.com/yt-dlp/yt-dlp) (site suppor
 and [FFmpeg](https://ffmpeg.org) (merging and conversion). The release packages
 bundle both, so nothing else needs to be installed.
 
+![VidOps main window](docs/screenshot.png)
+
 ## Tiếng Việt — hướng dẫn nhanh
 
 1. Tải bản build cho máy của bạn ở mục **Actions → Build → Artifacts** (hoặc **Releases** khi có tag `v*`):
