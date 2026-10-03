@@ -114,7 +114,8 @@ build\Release\VidOps.exe
 | macOS 12+ (Apple Silicon + Intel) | macos-14, universal binary | `VidOps-<ver>-macos-universal.dmg` (macdeployqt, ad-hoc signed) |
 | Linux x86_64 (glibc ≥ 2.35, e.g. Ubuntu 22.04+) | ubuntu-22.04 | `VidOps-<ver>-x86_64.AppImage` (linuxdeploy) |
 
-Pushing a tag such as `v0.1.0` also publishes the three packages as a GitHub Release.
+Pushing a tag such as `v0.1.0`, or running the **Build** workflow manually (Actions → Build → Run workflow)
+with `release_tag` set to e.g. `v0.1.0`, also publishes the three packages as a GitHub Release.
 Bundled tools: yt-dlp from its GitHub releases, FFmpeg GPL builds from
 [BtbN/FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds) (Windows, Linux) and
 [martin-riedl.de](https://ffmpeg.martin-riedl.de) (macOS).
