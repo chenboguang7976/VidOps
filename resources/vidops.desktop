@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=VidOps
+GenericName=Video Downloader
+Comment=Download videos from YouTube, TikTok and more as standard MP4
+Exec=VidOps
+Icon=vidops
+Terminal=false
+Categories=AudioVideo;Network;Qt;
+Keywords=download;video;youtube;tiktok;mp4;
