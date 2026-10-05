@@ -1,5 +1,7 @@
 #include "core/YtDlp.h"
 
+#include <QFile>
+
 namespace vidops::ytdlp {
 
 QString formatSort(const DownloadOptions &o)
@@ -29,11 +31,12 @@ QString formatSort(const DownloadOptions &o)
     return s.join(QLatin1Char(','));
 }
 
-QStringList buildArgs(const DownloadOptions &o, const QString &url)
+QStringList buildArgs(const DownloadOptions &o, const QString &url, const QString &pathsFile)
 {
     const QString tag = QString::fromLatin1(kProgressTag);
     QStringList a;
-    a << QStringLiteral("--newline") << QStringLiteral("--no-colors")
+    a << QStringLiteral("--encoding") << QStringLiteral("utf-8")
+      << QStringLiteral("--newline") << QStringLiteral("--no-colors")
       << QStringLiteral("--progress") << QStringLiteral("--no-simulate")
       << QStringLiteral("--no-mtime") << QStringLiteral("--embed-metadata")
       << QStringLiteral("--progress-template")
@@ -45,6 +48,19 @@ QStringList buildArgs(const DownloadOptions &o, const QString &url)
       << QStringLiteral("-O") << QStringLiteral("video:") + QString::fromLatin1(kTitleTag) + QStringLiteral("%(title)s")
       << QStringLiteral("-O") << QStringLiteral("after_move:") + QString::fromLatin1(kFileTag) + QStringLiteral("%(filepath)s")
       << (o.playlist ? QStringLiteral("--yes-playlist") : QStringLiteral("--no-playlist"));
+
+    if (!pathsFile.isEmpty()) {
+        // The FILE argument is itself an output template: escape '%'.
+        QString escaped = pathsFile;
+        escaped.replace(QLatin1Char('%'), QStringLiteral("%%"));
+        a << QStringLiteral("--print-to-file") << QStringLiteral("after_move:%(filepath)s") << escaped;
+    }
+
+    // YouTube needs a JavaScript runtime to unlock most formats. deno is
+    // yt-dlp's default; node is enabled too in case it is installed instead.
+    a << QStringLiteral("--js-runtimes")
+      << (o.denoPath.isEmpty() ? QStringLiteral("deno") : QStringLiteral("deno:") + o.denoPath)
+      << QStringLiteral("--js-runtimes") << QStringLiteral("node");
 
     if (!o.ffmpegPath.isEmpty())
         a << QStringLiteral("--ffmpeg-location") << o.ffmpegPath;
@@ -76,6 +92,21 @@ QStringList buildArgs(const DownloadOptions &o, const QString &url)
 
     a << QStringLiteral("--") << url;
     return a;
+}
+
+QStringList readPathsFile(const QString &pathsFile)
+{
+    QFile f(pathsFile);
+    if (!f.open(QIODevice::ReadOnly))
+        return {};
+    QStringList paths;
+    const QString text = QString::fromUtf8(f.readAll());
+    for (const QString &line : text.split(QLatin1Char('\n'))) {
+        const QString path = line.trimmed();
+        if (!path.isEmpty() && !paths.contains(path))
+            paths << path;
+    }
+    return paths;
 }
 
 static QString cleanField(const QString &s)

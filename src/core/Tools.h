@@ -12,6 +12,7 @@ struct ToolSet {
     QString ytdlp;
     QString ffmpeg;
     QString ffprobe;
+    QString deno;
     QString ytdlpVersion;
     QString ffmpegVersion;
     QSet<QString> encoders;  // from `ffmpeg -encoders`, empty if unknown

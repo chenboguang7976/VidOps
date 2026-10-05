@@ -94,6 +94,7 @@ void ToolDetector::detect(const QString &ytdlpOverride, const QString &ffmpegOve
             probeOverride = candidate;
     }
     tools->ffprobe = locateTool(QStringLiteral("ffprobe"), probeOverride);
+    tools->deno = locateTool(QStringLiteral("deno"));
 
     runCapture(this, tools->ytdlp, {QStringLiteral("--version")}, 20000,
                [this, tools](bool ok, const QString &out) {
