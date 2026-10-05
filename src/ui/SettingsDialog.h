@@ -25,6 +25,7 @@ private:
     QLineEdit *m_ytdlp;
     QLineEdit *m_ffmpeg;
     QLineEdit *m_ffprobe;
+    QLineEdit *m_extraArgs;
     QComboBox *m_cookiesBrowser;
     QLineEdit *m_cookiesFile;
     QLineEdit *m_template;

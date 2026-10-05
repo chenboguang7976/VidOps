@@ -2,6 +2,7 @@
 
 #include <QList>
 #include <QString>
+#include <QStringList>
 
 namespace vidops {
 
@@ -42,6 +43,7 @@ struct DownloadOptions {
     QString cookiesFile;       // Netscape cookies.txt, takes precedence over browser
     QString ffmpegPath;        // forwarded to yt-dlp --ffmpeg-location
     QString denoPath;          // JavaScript runtime for YouTube challenges, empty = let yt-dlp look
+    QStringList extraArgs;     // appended to the yt-dlp command line (Settings → extra arguments)
 };
 
 QString defaultFilenameTemplate();

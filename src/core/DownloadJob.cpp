@@ -106,6 +106,7 @@ void DownloadJob::resetForRetry()
     m_downloaded.clear();
     m_outputs.clear();
     m_fileIndex = 0;
+    m_retries = 0;
     m_hwFallbackUsed = false;
     m_cancelRequested = false;
     setState(State::Queued);
@@ -189,8 +190,14 @@ void DownloadJob::start(const ToolSet &tools)
         fail(tr("cannot create folder %1").arg(m_options.outputDir));
         return;
     }
+    m_retries = 0;
+    runYtDlp({});
+}
 
+void DownloadJob::runYtDlp(const QStringList &retryArgs)
+{
     DownloadOptions o = m_options;
+    o.extraArgs << retryArgs;
     if (o.ffmpegPath.isEmpty())
         o.ffmpegPath = m_tools.ffmpeg;
     if (o.denoPath.isEmpty())
@@ -292,6 +299,15 @@ void DownloadJob::onYtDlpFinished(int exitCode)
         return;
     }
     if (m_downloaded.isEmpty()) {
+        const QStringList retry = ytdlp::retryArgs(m_url, m_lastYtDlpError, m_retries);
+        if (!retry.isEmpty()) {
+            ++m_retries;
+            log(tr("YouTube refused the stream (%1), retrying with %2")
+                    .arg(m_lastYtDlpError, retry.join(QLatin1Char(' '))));
+            m_lastYtDlpError.clear();
+            runYtDlp(retry);
+            return;
+        }
         fail(m_lastYtDlpError.isEmpty() ? tr("yt-dlp exited with code %1").arg(exitCode)
                                         : m_lastYtDlpError);
         return;

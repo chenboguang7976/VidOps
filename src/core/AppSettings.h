@@ -10,6 +10,7 @@ struct AppSettings {
     QString ffmpegPath;   // empty = auto-detect
     QString ffprobePath;  // empty = auto-detect
     int maxConcurrent = 2;
+    QString ytdlpExtraArgs;  // free-form, split like a shell command line
 
     static QString defaultOutputDir();
     static AppSettings load();

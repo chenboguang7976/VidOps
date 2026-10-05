@@ -30,6 +30,11 @@ SettingsDialog::SettingsDialog(const AppSettings &settings, QWidget *parent)
     toolsForm->addRow(QStringLiteral("yt-dlp:"), m_ytdlp->parentWidget());
     toolsForm->addRow(QStringLiteral("ffmpeg:"), m_ffmpeg->parentWidget());
     toolsForm->addRow(QStringLiteral("ffprobe:"), m_ffprobe->parentWidget());
+    m_extraArgs = new QLineEdit(settings.ytdlpExtraArgs);
+    m_extraArgs->setPlaceholderText(QStringLiteral("--extractor-args \"youtube:player_client=default,-web\""));
+    m_extraArgs->setToolTip(tr("Extra command-line arguments appended to every yt-dlp call. "
+                               "See https://github.com/yt-dlp/yt-dlp#usage-and-options"));
+    toolsForm->addRow(tr("Extra yt-dlp arguments:"), m_extraArgs);
 
     // Download
     auto *dlBox = new QGroupBox(tr("Download"));
@@ -115,6 +120,7 @@ AppSettings SettingsDialog::settings() const
     s.ytdlpPath = m_ytdlp->text().trimmed();
     s.ffmpegPath = m_ffmpeg->text().trimmed();
     s.ffprobePath = m_ffprobe->text().trimmed();
+    s.ytdlpExtraArgs = m_extraArgs->text().trimmed();
     s.maxConcurrent = m_concurrent->value();
     DownloadOptions &o = s.options;
     o.cookiesBrowser = m_cookiesBrowser->currentData().toString();
