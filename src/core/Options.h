@@ -41,6 +41,7 @@ struct DownloadOptions {
     QString cookiesBrowser;    // e.g. "chrome", empty = none
     QString cookiesFile;       // Netscape cookies.txt, takes precedence over browser
     QString ffmpegPath;        // forwarded to yt-dlp --ffmpeg-location
+    QString denoPath;          // JavaScript runtime for YouTube challenges, empty = let yt-dlp look
 };
 
 QString defaultFilenameTemplate();

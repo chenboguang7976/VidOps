@@ -7,8 +7,9 @@ Instagram, X/Twitter, Vimeo and [1000+ other sites](https://github.com/yt-dlp/yt
 and saves them as **standard MP4** files: H.264, H.265 or AV1 video with AAC audio.
 
 Under the hood it drives [yt-dlp](https://github.com/yt-dlp/yt-dlp) (site support)
-and [FFmpeg](https://ffmpeg.org) (merging and conversion). The release packages
-bundle both, so nothing else needs to be installed.
+and [FFmpeg](https://ffmpeg.org) (merging and conversion), plus [deno](https://deno.com) as the
+JavaScript runtime yt-dlp needs to unlock all YouTube formats. The release packages bundle all
+three, so nothing else needs to be installed.
 
 ![VidOps main window](docs/screenshot.png)
 
@@ -68,7 +69,7 @@ URL ──► yt-dlp (-S res:1080,vcodec:h264,acodec:aac, merge → .mp4)
 | `tests` | Qt Test unit tests for the core |
 | `scripts` | Fetch the bundled tools; package the AppImage and DMG |
 
-VidOps looks for `yt-dlp`, `ffmpeg` and `ffprobe` next to its executable, in a `tools/` folder next to it,
+VidOps looks for `yt-dlp`, `ffmpeg`, `ffprobe` and `deno` next to its executable, in a `tools/` folder next to it,
 then on `PATH` (and in Homebrew / `~/.local/bin` on macOS and Linux). Any of them can be overridden in **Settings**.
 
 ## Building from source
@@ -110,7 +111,7 @@ build\Release\VidOps.exe
 
 | Platform | Runner | Package |
 |---|---|---|
-| Windows x64 | windows-2022, MSVC 2022 | `VidOps-<ver>-windows-x64.zip` (windeployqt + yt-dlp.exe + FFmpeg) |
+| Windows x64 | windows-2022, MSVC 2022 | `VidOps-<ver>-windows-x64.zip` (windeployqt + yt-dlp.exe + FFmpeg + deno) |
 | macOS 12+ (Apple Silicon + Intel) | macos-14, universal binary | `VidOps-<ver>-macos-universal.dmg` (macdeployqt, ad-hoc signed) |
 | Linux x86_64 (glibc ≥ 2.35, e.g. Ubuntu 22.04+) | ubuntu-22.04 | `VidOps-<ver>-x86_64.AppImage` (linuxdeploy) |
 
@@ -118,9 +119,9 @@ Pushing a tag such as `v0.1.0`, or running the **Build** workflow manually (Acti
 with `release_tag` set to e.g. `v0.1.0`, also publishes the three packages as a GitHub Release.
 Bundled tools: yt-dlp from its GitHub releases, FFmpeg GPL builds from
 [BtbN/FFmpeg-Builds](https://github.com/BtbN/FFmpeg-Builds) (Windows, Linux) and
-[martin-riedl.de](https://ffmpeg.martin-riedl.de) (macOS).
+[martin-riedl.de](https://ffmpeg.martin-riedl.de) (macOS), and deno from its GitHub releases.
 
 ## Legal
 
-VidOps is licensed under the GNU GPL v3 (see `LICENSE`). It bundles yt-dlp (Unlicense) and GPL builds of FFmpeg.
+VidOps is licensed under the GNU GPL v3 (see `LICENSE`). It bundles yt-dlp (Unlicense), GPL builds of FFmpeg and deno (MIT).
 Only download content you own or have permission to download, and respect each platform's terms of service.

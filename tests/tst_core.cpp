@@ -13,6 +13,8 @@ private slots:
     void formatSort();
     void buildArgs_video();
     void buildArgs_audio();
+    void buildArgs_unicodePaths();
+    void readPathsFile();
     void parseProgress();
     void parseOtherLines();
     void parseFfprobe();
@@ -83,6 +85,38 @@ void TestCore::buildArgs_audio()
     QCOMPARE(a.at(a.indexOf(QStringLiteral("--cookies")) + 1), QStringLiteral("/c.txt"));
     QVERIFY(!a.contains(QStringLiteral("--cookies-from-browser")));
     QVERIFY(!a.contains(QStringLiteral("-S")));
+}
+
+void TestCore::buildArgs_unicodePaths()
+{
+    DownloadOptions o;
+    o.denoPath = QStringLiteral("C:/VidOps/tools/deno.exe");
+    const QString paths = QStringLiteral("C:/Temp/100%/vidops-1.txt");
+    const QStringList a = ytdlp::buildArgs(o, QStringLiteral("https://x.y/z"), paths);
+    QCOMPARE(a.at(a.indexOf(QStringLiteral("--encoding")) + 1), QStringLiteral("utf-8"));
+    const int p = a.indexOf(QStringLiteral("--print-to-file"));
+    QVERIFY(p >= 0);
+    QCOMPARE(a.at(p + 1), QStringLiteral("after_move:%(filepath)s"));
+    QCOMPARE(a.at(p + 2), QStringLiteral("C:/Temp/100%%/vidops-1.txt"));
+    QCOMPARE(a.at(a.indexOf(QStringLiteral("--js-runtimes")) + 1),
+             QStringLiteral("deno:C:/VidOps/tools/deno.exe"));
+    QVERIFY(a.contains(QStringLiteral("node")));
+
+    const QStringList b = ytdlp::buildArgs(DownloadOptions(), QStringLiteral("https://x.y/z"));
+    QVERIFY(!b.contains(QStringLiteral("--print-to-file")));
+    QCOMPARE(b.at(b.indexOf(QStringLiteral("--js-runtimes")) + 1), QStringLiteral("deno"));
+}
+
+void TestCore::readPathsFile()
+{
+    QTemporaryFile f;
+    QVERIFY(f.open());
+    const QString a = QStringLiteral("C:\\Users\\me\\Downloads\\VidOps\\【KTV】海阔天空 – Bài hát tiếng Việt [abc].mp4");
+    const QString b = QStringLiteral("/home/me/Видео [x].mp4");
+    f.write((a + QStringLiteral("\r\n") + b + QStringLiteral("\r\n") + a + QStringLiteral("\r\n\r\n")).toUtf8());
+    f.close();
+    QCOMPARE(ytdlp::readPathsFile(f.fileName()), (QStringList{a, b}));
+    QVERIFY(ytdlp::readPathsFile(QStringLiteral("/nonexistent/file.txt")).isEmpty());
 }
 
 void TestCore::parseProgress()

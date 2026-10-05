@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Downloads standalone yt-dlp, ffmpeg and ffprobe into DEST so they can be
+# Downloads standalone yt-dlp, ffmpeg, ffprobe and deno (the JavaScript runtime
+# yt-dlp needs for YouTube) into DEST so they can be
 # bundled with VidOps (VidOps looks next to its executable and in ./tools).
 #
 #   scripts/fetch-tools.sh DEST [linux|macos]
@@ -21,6 +22,7 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
 fetch() { curl -fL --retry 4 --retry-delay 3 -o "$2" "$1"; }
+deno_url() { echo "https://github.com/denoland/deno/releases/latest/download/deno-$1.zip"; }
 
 case "$platform" in
   linux)
@@ -38,6 +40,8 @@ case "$platform" in
       [[ "$name" =~ \.so\.[0-9]+$ ]] && cp -L "$lib" "$dest/lib/$name"
     done
     patchelf --set-rpath '$ORIGIN/lib' "$dest/ffmpeg" "$dest/ffprobe"
+    fetch "$(deno_url x86_64-unknown-linux-gnu)" "$work/deno.zip"
+    unzip -o -q "$work/deno.zip" -d "$dest"
     ;;
   macos)
     fetch https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos "$dest/yt-dlp"
@@ -52,11 +56,18 @@ case "$platform" in
       done
       lipo -create "${slices[@]}" -output "$dest/$tool"
     done
+    for arch in aarch64 x86_64; do
+      fetch "$(deno_url $arch-apple-darwin)" "$work/deno-$arch.zip"
+      mkdir -p "$work/deno-$arch"
+      unzip -o -q "$work/deno-$arch.zip" -d "$work/deno-$arch"
+    done
+    lipo -create "$work/deno-aarch64/deno" "$work/deno-x86_64/deno" -output "$dest/deno"
     ;;
   *)
     echo "unknown platform: $platform" >&2; exit 1 ;;
 esac
 
-chmod +x "$dest/yt-dlp" "$dest/ffmpeg" "$dest/ffprobe"
+chmod +x "$dest/yt-dlp" "$dest/ffmpeg" "$dest/ffprobe" "$dest/deno"
 "$dest/ffmpeg" -hide_banner -version | head -n1
+"$dest/deno" --version | head -n1
 echo "tools ready in $dest"

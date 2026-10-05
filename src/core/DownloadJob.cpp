@@ -3,9 +3,11 @@
 #include "core/Process.h"
 #include "core/YtDlp.h"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QUuid>
 
 namespace vidops {
 
@@ -23,6 +25,8 @@ DownloadJob::~DownloadJob()
     }
     if (!m_tempFile.isEmpty())
         QFile::remove(m_tempFile);
+    if (!m_pathsFile.isEmpty())
+        QFile::remove(m_pathsFile);
 }
 
 bool DownloadJob::isActive() const
@@ -189,7 +193,15 @@ void DownloadJob::start(const ToolSet &tools)
     DownloadOptions o = m_options;
     if (o.ffmpegPath.isEmpty())
         o.ffmpegPath = m_tools.ffmpeg;
-    const QStringList args = ytdlp::buildArgs(o, m_url);
+    if (o.denoPath.isEmpty())
+        o.denoPath = m_tools.deno;
+    if (!m_pathsFile.isEmpty())
+        QFile::remove(m_pathsFile);
+    m_pathsFile = QDir::temp().filePath(
+        QStringLiteral("vidops-%1-%2.txt")
+            .arg(QCoreApplication::applicationPid())
+            .arg(QUuid::createUuid().toString(QUuid::Id128)));
+    const QStringList args = ytdlp::buildArgs(o, m_url, m_pathsFile);
 
     QProcess *p = newProcess();
     p->setProcessChannelMode(QProcess::MergedChannels);
@@ -266,6 +278,15 @@ void DownloadJob::onYtDlpFinished(int exitCode)
 {
     m_proc->deleteLater();
     m_proc = nullptr;
+
+    // Paths from the UTF-8 file are exact; the console copies may have lost
+    // characters to the Windows code page.
+    const QStringList exact = ytdlp::readPathsFile(m_pathsFile);
+    QFile::remove(m_pathsFile);
+    m_pathsFile.clear();
+    if (!exact.isEmpty())
+        m_downloaded = exact;
+
     if (m_cancelRequested) {
         finishCancelled();
         return;
@@ -301,6 +322,10 @@ void DownloadJob::processNextFile()
         return;
     }
     const QString file = m_downloaded.at(m_fileIndex);
+    if (!QFileInfo::exists(file)) {
+        fail(tr("downloaded file not found: %1").arg(file));
+        return;
+    }
     if (!convertsVideo(m_options.format)) {
         m_outputs << file;
         ++m_fileIndex;

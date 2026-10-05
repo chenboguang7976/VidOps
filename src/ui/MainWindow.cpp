@@ -284,12 +284,18 @@ void MainWindow::onToolsDetected(const ToolSet &tools)
                      "or set their paths in File → Settings.").arg(missing.join(QStringLiteral(", "))));
     }
     m_toolsLabel->setText(text);
-    m_toolsLabel->setToolTip(QStringLiteral("yt-dlp: %1\nffmpeg: %2\nffprobe: %3")
-                                 .arg(tools.ytdlp, tools.ffmpeg, tools.ffprobe));
+    m_toolsLabel->setToolTip(QStringLiteral("yt-dlp: %1\nffmpeg: %2\nffprobe: %3\ndeno: %4")
+                                 .arg(tools.ytdlp, tools.ffmpeg, tools.ffprobe,
+                                      tools.deno.isEmpty() ? tr("not found") : tools.deno));
     if (!tools.ytdlp.isEmpty())
         appendLog(tr("Using yt-dlp: %1").arg(tools.ytdlp));
     if (!tools.ffmpeg.isEmpty())
         appendLog(tr("Using ffmpeg: %1").arg(tools.ffmpeg));
+    if (!tools.deno.isEmpty())
+        appendLog(tr("Using deno: %1").arg(tools.deno));
+    else
+        appendLog(tr("deno was not found: YouTube may offer fewer formats. "
+                     "Put deno next to yt-dlp or install it from https://deno.com"));
 }
 
 void MainWindow::refreshEncoderCombo()

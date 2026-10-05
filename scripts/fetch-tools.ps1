@@ -1,4 +1,5 @@
-# Downloads standalone yt-dlp.exe, ffmpeg.exe and ffprobe.exe (+ DLLs) into
+# Downloads standalone yt-dlp.exe, ffmpeg.exe, ffprobe.exe (+ DLLs) and deno.exe
+# (the JavaScript runtime yt-dlp needs for YouTube) into
 # -Dest so they can be bundled with VidOps (it looks in .\tools next to VidOps.exe).
 #
 #   powershell -ExecutionPolicy Bypass -File scripts\fetch-tools.ps1 -Dest dist\VidOps\tools
@@ -22,7 +23,13 @@ try {
     $bin = Get-ChildItem -Path $work -Directory -Filter 'ffmpeg-*' | Select-Object -First 1
     Copy-Item -Path (Join-Path $bin.FullName 'bin\*') -Include 'ffmpeg.exe', 'ffprobe.exe', '*.dll' -Destination $Dest
 
+    $denoZip = Join-Path $work 'deno.zip'
+    Invoke-WebRequest -Uri 'https://github.com/denoland/deno/releases/latest/download/deno-x86_64-pc-windows-msvc.zip' `
+        -OutFile $denoZip
+    Expand-Archive -Path $denoZip -DestinationPath $Dest -Force
+
     & (Join-Path $Dest 'ffmpeg.exe') -hide_banner -version | Select-Object -First 1
+    & (Join-Path $Dest 'deno.exe') --version | Select-Object -First 1
     Write-Host "tools ready in $Dest"
 }
 finally {

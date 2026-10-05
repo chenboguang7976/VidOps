@@ -88,6 +88,7 @@ private:
     QByteArray m_stderrBuf;
     QStringList m_stderrTail;
     QString m_tempFile;
+    QString m_pathsFile;
 };
 
 }  // namespace vidops
