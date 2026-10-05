@@ -55,6 +55,7 @@ private:
     void drainLines(QProcess *proc, QByteArray &buffer, bool flush,
                     const std::function<void(const QString &)> &handler);
 
+    void runYtDlp(const QStringList &retryArgs);
     void handleYtDlpLine(const QString &line);
     void onYtDlpFinished(int exitCode);
     void processNextFile();
@@ -80,6 +81,7 @@ private:
     QStringList m_downloaded;  // files yt-dlp reported
     QStringList m_outputs;     // final files
     int m_fileIndex = 0;
+    int m_retries = 0;
     bool m_hwFallbackUsed = false;
     bool m_cancelRequested = false;
 

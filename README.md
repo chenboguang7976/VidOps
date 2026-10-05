@@ -35,6 +35,10 @@ three, so nothing else needs to be installed.
 4. Video riêng tư / giới hạn tuổi / cần đăng nhập: vào **File → Settings → Cookies from browser** và chọn trình duyệt đã đăng nhập.
 5. Khi một trang ngừng tải được, chọn **Tools → Update yt-dlp**.
 
+6. Gặp lỗi **HTTP Error 403** với YouTube: VidOps tự thử lại một lần với client YouTube khác
+   (`--extractor-args youtube:player_client=default,-web`). Nếu vẫn lỗi, thử **Tools → Update yt-dlp**, hoặc thêm
+   tham số riêng ở **File → Settings → Extra yt-dlp arguments**.
+
 > Chỉ tải nội dung bạn sở hữu hoặc được phép tải, và tuân thủ điều khoản của từng nền tảng.
 
 ## Features

@@ -28,6 +28,7 @@
 #include <QMessageBox>
 #include <QMimeData>
 #include <QPlainTextEdit>
+#include <QProcess>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QSettings>
@@ -347,6 +348,7 @@ DownloadOptions MainWindow::currentOptions() const
     if (o.outputDir.isEmpty())
         o.outputDir = AppSettings::defaultOutputDir();
     o.ffmpegPath = m_tools.ffmpeg;
+    o.extraArgs = QProcess::splitCommand(m_settings.ytdlpExtraArgs);
     return o;
 }
 

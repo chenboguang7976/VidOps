@@ -1,6 +1,7 @@
 #include "core/YtDlp.h"
 
 #include <QFile>
+#include <QUrl>
 
 namespace vidops::ytdlp {
 
@@ -90,8 +91,31 @@ QStringList buildArgs(const DownloadOptions &o, const QString &url, const QStrin
     if (!sort.isEmpty())
         a << QStringLiteral("-S") << sort;
 
+    a << o.extraArgs;
     a << QStringLiteral("--") << url;
     return a;
+}
+
+static bool isYouTube(const QString &url)
+{
+    const QString host = QUrl(url).host().toLower();
+    for (const char *domain : {"youtube.com", "youtu.be", "youtube-nocookie.com"}) {
+        const QString d = QString::fromLatin1(domain);
+        if (host == d || host.endsWith(QLatin1Char('.') + d))
+            return true;
+    }
+    return false;
+}
+
+QStringList retryArgs(const QString &url, const QString &error, int attempt)
+{
+    // With a JavaScript runtime yt-dlp also uses YouTube's "web" client, whose
+    // streams can be refused with 403 when YouTube wants a PO token for them.
+    // The remaining default clients (what yt-dlp uses without a runtime)
+    // usually still work.
+    if (attempt == 0 && isYouTube(url) && error.contains(QLatin1String("HTTP Error 403")))
+        return {QStringLiteral("--extractor-args"), QStringLiteral("youtube:player_client=default,-web")};
+    return {};
 }
 
 QStringList readPathsFile(const QString &pathsFile)

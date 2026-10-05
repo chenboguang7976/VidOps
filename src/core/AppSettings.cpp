@@ -42,6 +42,7 @@ AppSettings AppSettings::load()
     a.ytdlpPath = s.value(QStringLiteral("tools/ytdlp")).toString();
     a.ffmpegPath = s.value(QStringLiteral("tools/ffmpeg")).toString();
     a.ffprobePath = s.value(QStringLiteral("tools/ffprobe")).toString();
+    a.ytdlpExtraArgs = s.value(QStringLiteral("tools/ytdlpExtraArgs")).toString();
     a.maxConcurrent = qBound(1, s.value(QStringLiteral("download/maxConcurrent"), 2).toInt(), 8);
     return a;
 }
@@ -66,6 +67,7 @@ void AppSettings::save() const
     s.setValue(QStringLiteral("tools/ytdlp"), ytdlpPath);
     s.setValue(QStringLiteral("tools/ffmpeg"), ffmpegPath);
     s.setValue(QStringLiteral("tools/ffprobe"), ffprobePath);
+    s.setValue(QStringLiteral("tools/ytdlpExtraArgs"), ytdlpExtraArgs);
     s.setValue(QStringLiteral("download/maxConcurrent"), maxConcurrent);
 }
 

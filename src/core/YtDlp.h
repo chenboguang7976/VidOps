@@ -23,6 +23,11 @@ QString formatSort(const DownloadOptions &o);
 QStringList buildArgs(const DownloadOptions &o, const QString &url,
                       const QString &pathsFile = {});
 
+// Extra yt-dlp arguments for another attempt after a download failed with
+// `error`, or empty when retrying would not help. `attempt` counts the
+// retries already made.
+QStringList retryArgs(const QString &url, const QString &error, int attempt);
+
 // Reads the file written via --print-to-file: unique, non-empty lines.
 QStringList readPathsFile(const QString &pathsFile);
 

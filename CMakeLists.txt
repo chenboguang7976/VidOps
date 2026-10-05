@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 
 project(VidOps
-    VERSION 0.1.1
+    VERSION 0.1.2
     DESCRIPTION "Cross-platform desktop video downloader"
     LANGUAGES CXX)
 

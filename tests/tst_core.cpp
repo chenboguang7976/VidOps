@@ -15,6 +15,7 @@ private slots:
     void buildArgs_audio();
     void buildArgs_unicodePaths();
     void readPathsFile();
+    void retryOn403();
     void parseProgress();
     void parseOtherLines();
     void parseFfprobe();
@@ -117,6 +118,26 @@ void TestCore::readPathsFile()
     f.close();
     QCOMPARE(ytdlp::readPathsFile(f.fileName()), (QStringList{a, b}));
     QVERIFY(ytdlp::readPathsFile(QStringLiteral("/nonexistent/file.txt")).isEmpty());
+}
+
+void TestCore::retryOn403()
+{
+    const QString err = QStringLiteral("unable to download video data: HTTP Error 403: Forbidden");
+    const QStringList r = ytdlp::retryArgs(QStringLiteral("https://youtu.be/_2PihbUNuIU?si=x"), err, 0);
+    QCOMPARE(r, (QStringList{QStringLiteral("--extractor-args"),
+                             QStringLiteral("youtube:player_client=default,-web")}));
+    QVERIFY(!ytdlp::retryArgs(QStringLiteral("https://m.youtube.com/watch?v=a"), err, 0).isEmpty());
+    QVERIFY(ytdlp::retryArgs(QStringLiteral("https://youtu.be/a"), err, 1).isEmpty());
+    QVERIFY(ytdlp::retryArgs(QStringLiteral("https://www.tiktok.com/@a/video/1"), err, 0).isEmpty());
+    QVERIFY(ytdlp::retryArgs(QStringLiteral("https://notyoutube.com/x"), err, 0).isEmpty());
+    QVERIFY(ytdlp::retryArgs(QStringLiteral("https://youtu.be/a"),
+                             QStringLiteral("Video unavailable"), 0).isEmpty());
+
+    DownloadOptions o;
+    o.extraArgs = r;
+    const QStringList a = ytdlp::buildArgs(o, QStringLiteral("https://youtu.be/a"));
+    QCOMPARE(a.at(a.size() - 4), QStringLiteral("--extractor-args"));
+    QCOMPARE(a.at(a.size() - 2), QStringLiteral("--"));
 }
 
 void TestCore::parseProgress()
