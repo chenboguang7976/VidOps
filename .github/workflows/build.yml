@@ -24,7 +24,7 @@ jobs:
     name: Linux (AppImage)
     runs-on: ubuntu-22.04  # oldest supported glibc -> AppImage runs on more distros
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Version
         run: scripts/ci-version.sh >> "$GITHUB_ENV"
@@ -36,7 +36,7 @@ jobs:
             libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-shape0 \
             libxcb-xinerama0 libxcb-xkb1
 
-      - uses: jurplel/install-qt-action@v4
+      - uses: jurplel/install-qt-action@a9c63c7c123f3069cff414e7e482d95dfa9d8125 # v4.4.1
         with:
           version: ${{ env.QT_VERSION }}
           cache: true
@@ -52,7 +52,7 @@ jobs:
       - name: Package AppImage
         run: scripts/package-linux.sh build dist "$VERSION"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: VidOps-linux-x86_64
           path: dist/*.AppImage
@@ -62,13 +62,13 @@ jobs:
     name: Windows (zip)
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Version
         shell: bash
         run: scripts/ci-version.sh >> "$GITHUB_ENV"
 
-      - uses: jurplel/install-qt-action@v4
+      - uses: jurplel/install-qt-action@a9c63c7c123f3069cff414e7e482d95dfa9d8125 # v4.4.1
         with:
           version: ${{ env.QT_VERSION }}
           arch: win64_msvc2022_64
@@ -93,7 +93,7 @@ jobs:
           Copy-Item LICENSE, README.md $dist
           Compress-Archive -Path $dist -DestinationPath "dist/VidOps-$env:VERSION-windows-x64.zip"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: VidOps-windows-x64
           path: dist/*.zip
@@ -103,12 +103,12 @@ jobs:
     name: macOS (dmg, universal)
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Version
         run: scripts/ci-version.sh >> "$GITHUB_ENV"
 
-      - uses: jurplel/install-qt-action@v4
+      - uses: jurplel/install-qt-action@a9c63c7c123f3069cff414e7e482d95dfa9d8125 # v4.4.1
         with:
           version: ${{ env.QT_VERSION }}
           cache: true
@@ -125,7 +125,7 @@ jobs:
       - name: Package
         run: scripts/package-macos.sh build dist "$VERSION"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: VidOps-macos-universal
           path: dist/*.dmg
@@ -139,11 +139,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           path: dist
           merge-multiple: true
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2.6.2
         with:
           # Tag pushes use the pushed tag; manual runs create the tag on the built commit.
           tag_name: ${{ inputs.release_tag || github.ref_name }}
